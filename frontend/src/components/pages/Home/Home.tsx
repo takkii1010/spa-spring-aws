@@ -11,6 +11,8 @@ type Question = {
  */
 export const Home = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [userId, setUserId] = useState('');
+  const [userPassword, setUserPassword] = useState('');
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -25,6 +27,29 @@ export const Home = () => {
     fetchQuestions();
   }, []);
 
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    try {
+      const loginResponse = await fetch('http://localhost:9080/api/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, userPassword }),
+      });
+
+      if (loginResponse.ok) {
+        console.log('ログイン成功:', loginResponse);
+      } else {
+        console.error('ログイン失敗:', loginResponse);
+      }
+
+    } catch (error) {
+      console.error('ログインエラー:', error);
+    }
+  };
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -35,8 +60,8 @@ export const Home = () => {
     const response = await fetch('http://localhost:9080/api/qa', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({ text }),
         mode: 'cors',
@@ -60,6 +85,29 @@ export const Home = () => {
       <header className={styles.header}>
           <h1 className={styles.title}>質問一覧</h1>            
       </header>
+      <form method="post" onSubmit={handleLogin}>
+        <div>
+          <input
+            type="text"
+            name="userId"
+            placeholder="ユーザー名"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+          />
+        </div>
+        <div>
+          <input
+            type="userPassword"
+            name="userPassword"
+            placeholder="パスワード"
+            value={userPassword}
+            onChange={(e) => setUserPassword(e.target.value)}
+          />
+        </div>
+        <button className={styles.button} type="submit">
+          ログイン
+        </button>
+      </form>
       <form method="post" onSubmit={handleSubmit}>
         <div>
           <textarea className={styles.input} name="text" placeholder="質問内容を記入してください" cols={50} rows={10}/>

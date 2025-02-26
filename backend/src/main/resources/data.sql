@@ -1,0 +1,1 @@
+MERGE INTO USERS SELECT * FROM CSVREAD('classpath:/data/USERS.csv');
